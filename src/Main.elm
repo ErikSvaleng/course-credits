@@ -3,8 +3,9 @@ module Main exposing (main)
 import Browser
 import CourseCredits exposing (Credit, CreditSubject(..), Credits, Subject, Subjects)
 import Html exposing (Html, button, div, input, option, select, text)
-import Html.Attributes exposing (name, placeholder, selected, type_, value)
+import Html.Attributes exposing (disabled, name, placeholder, selected, type_, value)
 import Html.Events exposing (onClick, onInput)
+import Html.Keyed as Keyed
 import IndexedList exposing (Index)
 
 
@@ -102,14 +103,20 @@ view : Model -> Html Msg
 view model =
     div []
         [ div [] (model.credits |> IndexedList.map2List (renderCredit model))
-        , div [] [ button [ onClick SubjectAdded ] [ text "Add subject" ] ]
+        , div [] [ button [ onClick SubjectAdded, disabled (model |> canAddSubject |> not) ] [ text "Add subject" ] ]
         ]
+
+
+canAddSubject : Model -> Bool
+canAddSubject model =
+    (model.availableSubjects |> List.length |> (/=) 0) && (model.credits |> CourseCredits.anyMissingSubject |> not)
 
 
 renderCredit : Model -> Index -> Credit -> Html Msg
 renderCredit model index credit =
     div []
-        [ select [ name "subjects", onInput (subjectChanged model.allSubjects index) ]
+        [ Keyed.node "select"
+            [ name "subjects", onInput (subjectChanged model.allSubjects index) ]
             (subjectOptions credit model.availableSubjects)
         , input
             [ placeholder "Hours"
@@ -128,7 +135,7 @@ renderCredit model index credit =
         ]
 
 
-subjectOptions : Credit -> Subjects -> List (Html Msg)
+subjectOptions : Credit -> Subjects -> List ( String, Html Msg )
 subjectOptions credit availableSubjects =
     let
         options =
@@ -137,17 +144,17 @@ subjectOptions credit availableSubjects =
         selectedSubject =
             case credit.subject of
                 NotSelected ->
-                    option [ value "0" ] [ text "-- Choose subject --" ]
+                    ( "empty", option [ value "0" ] [ text "-- Choose subject --" ] )
 
                 Selected subject ->
-                    option [ value (String.fromInt subject.id), selected True ] [ text subject.name ]
+                    ( "subject.name", option [ value (String.fromInt subject.id), selected True ] [ text subject.name ] )
     in
     selectedSubject :: options
 
 
-subjectOption : Subject -> Html Msg
+subjectOption : Subject -> ( String, Html Msg )
 subjectOption subject =
-    option [ value <| String.fromInt subject.id, selected False ] [ text subject.name ]
+    ( subject.name, option [ value <| String.fromInt subject.id, selected False ] [ text subject.name ] )
 
 
 subjectChanged : List Subject -> Index -> String -> Msg

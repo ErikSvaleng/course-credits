@@ -1,4 +1,4 @@
-module CourseCredits exposing (Credit, CreditSubject(..), Credits, Subject, SubjectId, Subjects, addCredit, diffSubjects, empty, getSelectedSubjects, getSubjectById, updateHours, updateSubject)
+module CourseCredits exposing (Credit, CreditSubject(..), Credits, Subject, SubjectId, Subjects, addCredit, anyMissingSubject, diffSubjects, empty, getSelectedSubjects, getSubjectById, updateHours, updateSubject)
 
 import IndexedList exposing (Index, IndexedList)
 import Set
@@ -31,6 +31,23 @@ type alias Credit =
 
 type alias Credits =
     IndexedList Credit
+
+
+anyMissingSubject : Credits -> Bool
+anyMissingSubject credits =
+    credits
+        |> IndexedList.filter2List
+            (\_ credit ->
+                case credit.subject of
+                    Selected _ ->
+                        False
+
+                    NotSelected ->
+                        True
+            )
+        |> List.length
+        |> Debug.log "Missing subjects length"
+        |> (<) 0
 
 
 updateHours : Index -> Float -> Credits -> Credits
