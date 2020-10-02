@@ -2,7 +2,7 @@ module Main exposing (main)
 
 import Browser
 import CourseCredits exposing (Credit, CreditSubject(..), Credits, Subject, Subjects)
-import Html exposing (Html, button, div, input, option, select, text)
+import Html exposing (Html, button, div, input, option, text)
 import Html.Attributes exposing (disabled, name, placeholder, selected, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Html.Keyed as Keyed
@@ -53,6 +53,7 @@ type Msg
     = ChangedCreditSubject Index (Maybe Subject)
     | HoursChanged Index Float
     | SubjectAdded
+    | SubjectRemoved Index
 
 
 
@@ -71,6 +72,21 @@ update msg model =
         SubjectAdded ->
             { model | credits = CourseCredits.addCredit (Credit NotSelected 0) model.credits }
 
+        SubjectRemoved index ->
+            removeCreditSubject index model
+
+
+removeCreditSubject : Index -> Model -> Model
+removeCreditSubject index model =
+    model
+        |> updateCredits (CourseCredits.remove index)
+        |> updateAvailableSubjects
+
+
+updateCredits : (Credits -> Credits) -> Model -> Model
+updateCredits updatefn model =
+    { model | credits = updatefn model.credits }
+
 
 changeCreditSubject : Index -> Maybe Subject -> Model -> Model
 changeCreditSubject index maybeSubject model =
@@ -87,7 +103,6 @@ updateSubject index maybeSubject model =
 
         Just subject ->
             { model | credits = CourseCredits.updateSubject index subject model.credits }
-                |> Debug.log "model after update"
 
 
 updateAvailableSubjects : Model -> Model
@@ -132,6 +147,7 @@ renderCredit model index credit =
             , onInput (parseHourInput >> HoursChanged index)
             ]
             []
+        , button [ onClick (SubjectRemoved index) ] [ text "Remove" ]
         ]
 
 

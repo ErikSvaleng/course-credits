@@ -1,4 +1,4 @@
-module CourseCredits exposing (Credit, CreditSubject(..), Credits, Subject, SubjectId, Subjects, addCredit, anyMissingSubject, diffSubjects, empty, getSelectedSubjects, getSubjectById, updateHours, updateSubject)
+module CourseCredits exposing (Credit, CreditSubject(..), Credits, Subject, SubjectId, Subjects, addCredit, anyMissingSubject, diffSubjects, empty, getSelectedSubjects, getSubjectById, remove, updateHours, updateSubject)
 
 import IndexedList exposing (Index, IndexedList)
 import Set
@@ -46,13 +46,17 @@ anyMissingSubject credits =
                         True
             )
         |> List.length
-        |> Debug.log "Missing subjects length"
         |> (<) 0
 
 
 updateHours : Index -> Float -> Credits -> Credits
 updateHours index hours credits =
     IndexedList.update (updateCreditHours hours) index credits
+
+
+remove : Index -> Credits -> Credits
+remove index credits =
+    IndexedList.remove index credits
 
 
 updateCreditHours : Float -> Credit -> Credit
