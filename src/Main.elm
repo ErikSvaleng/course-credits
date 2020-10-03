@@ -2,12 +2,13 @@ module Main exposing (main)
 
 import Browser
 import CourseCredits exposing (Credit, CreditSubject(..), Credits, Subject, Subjects, decodeSubjects)
-import Html exposing (Html, button, div, input, option, text)
-import Html.Attributes exposing (disabled, name, placeholder, selected, type_, value)
-import Html.Events exposing (onClick, onInput)
+import Html exposing (Html, div, input, label, option, text)
+import Html.Attributes exposing (class, for, id, name, placeholder, selected, type_, value)
+import Html.Events exposing (onInput)
 import Html.Keyed as Keyed
 import IndexedList exposing (Index)
 import Json.Decode
+import ViewElements exposing (container, dangerButton, formGroupRow, mainHeading, paragraph, primaryButton)
 
 
 
@@ -124,9 +125,11 @@ updateAvailableSubjects model =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ div [] (model.credits |> IndexedList.map2List (renderCredit model))
-        , div [] [ button [ onClick SubjectAdded, disabled (model |> canAddSubject |> not) ] [ text "Add subject" ] ]
+    container
+        [ mainHeading "Enter course credits"
+        , paragraph "Select your course subject from the dropdown, and enter credited hours in the input"
+        , div [] (model.credits |> IndexedList.map2List (renderCredit model))
+        , div [] [ primaryButton "Add subject" SubjectAdded (model |> canAddSubject |> not) ]
         ]
 
 
@@ -137,25 +140,29 @@ canAddSubject model =
 
 renderCredit : Model -> Index -> Credit -> Html Msg
 renderCredit model index credit =
-    div []
-        [ Keyed.node "select"
-            [ name "subjects", onInput (subjectChanged model.allSubjects index) ]
+    formGroupRow
+        [ label [ class "col-sm-1 col-form-label", for "subjectSelection" ] [ index + 1 |> String.fromInt |> text ]
+        , Keyed.node "select"
+            [ name "subjects", class "col-sm-4 custom-select", id "subjectSelection", onInput (subjectChanged model.allSubjects index) ]
             (subjectOptions credit model.availableSubjects)
-        , input
-            [ placeholder "Hours"
-            , type_ "number"
-            , name ("subjectHours-" ++ String.fromInt index)
-            , value
-                (if credit.hours > 0 then
-                    String.fromFloat credit.hours
+        , div [ class "col-sm-3" ]
+            [ input
+                [ placeholder "Hours"
+                , type_ "number"
+                , name ("subjectHours-" ++ String.fromInt index)
+                , class "form-control"
+                , value
+                    (if credit.hours > 0 then
+                        String.fromFloat credit.hours
 
-                 else
-                    ""
-                )
-            , onInput (parseHourInput >> HoursChanged index)
+                     else
+                        ""
+                    )
+                , onInput (parseHourInput >> HoursChanged index)
+                ]
+                []
             ]
-            []
-        , button [ onClick (SubjectRemoved index) ] [ text "Remove" ]
+        , div [ class "col-sm-2" ] [ dangerButton "Remove" (SubjectRemoved index) False ]
         ]
 
 

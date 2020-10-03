@@ -6064,7 +6064,6 @@ var $author$project$Main$update = F2(
 	});
 var $elm$json$Json$Decode$value = _Json_decodeValue;
 var $author$project$Main$SubjectAdded = {$: 'SubjectAdded'};
-var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$core$Dict$filter = F2(
 	function (isGood, dict) {
 		return A3(
@@ -6112,16 +6111,37 @@ var $elm$core$Basics$not = _Basics_not;
 var $author$project$Main$canAddSubject = function (model) {
 	return (!(!$elm$core$List$length(model.availableSubjects))) && (!$author$project$CourseCredits$anyMissingSubject(model.credits));
 };
-var $elm$json$Json$Encode$bool = _Json_wrap;
-var $elm$html$Html$Attributes$boolProperty = F2(
-	function (key, bool) {
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
 		return A2(
 			_VirtualDom_property,
 			key,
-			$elm$json$Json$Encode$bool(bool));
+			$elm$json$Json$Encode$string(string));
 	});
-var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
+var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$div = _VirtualDom_node('div');
+var $author$project$ViewElements$container = function (content) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('container pt-3')
+			]),
+		content);
+};
+var $elm$html$Html$h1 = _VirtualDom_node('h1');
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$ViewElements$mainHeading = function (string) {
+	return A2(
+		$elm$html$Html$h1,
+		_List_Nil,
+		_List_fromArray(
+			[
+				$elm$html$Html$text(string)
+			]));
+};
 var $elm$core$Dict$map = F2(
 	function (func, dict) {
 		if (dict.$ === 'RBEmpty_elm_builtin') {
@@ -6147,6 +6167,26 @@ var $author$project$IndexedList$map2List = F2(
 		return $elm$core$Dict$values(
 			A2($elm$core$Dict$map, mapfn, dict));
 	});
+var $elm$html$Html$p = _VirtualDom_node('p');
+var $author$project$ViewElements$paragraph = function (string) {
+	return A2(
+		$elm$html$Html$p,
+		_List_Nil,
+		_List_fromArray(
+			[
+				$elm$html$Html$text(string)
+			]));
+};
+var $elm$html$Html$button = _VirtualDom_node('button');
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$bool(bool));
+	});
+var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -6164,6 +6204,24 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
 };
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
+var $author$project$ViewElements$standardBtn = F4(
+	function (buttonType, label, onClickMsg, isDisabled) {
+		return A2(
+			$elm$html$Html$button,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$type_('button'),
+					$elm$html$Html$Attributes$class('btn ' + buttonType),
+					$elm$html$Html$Events$onClick(onClickMsg),
+					$elm$html$Html$Attributes$disabled(isDisabled)
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text(label)
+				]));
+	});
+var $author$project$ViewElements$primaryButton = $author$project$ViewElements$standardBtn('btn-outline-primary');
 var $author$project$Main$HoursChanged = F2(
 	function (a, b) {
 		return {$: 'HoursChanged', a: a, b: b};
@@ -6176,16 +6234,21 @@ var $elm$core$Basics$composeR = F3(
 		return g(
 			f(x));
 	});
+var $author$project$ViewElements$dangerButton = $author$project$ViewElements$standardBtn('btn-outline-danger');
+var $elm$html$Html$Attributes$for = $elm$html$Html$Attributes$stringProperty('htmlFor');
+var $author$project$ViewElements$formGroupRow = function (content) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('form-group row')
+			]),
+		content);
+};
 var $elm$core$String$fromFloat = _String_fromNumber;
+var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
 var $elm$html$Html$input = _VirtualDom_node('input');
-var $elm$json$Json$Encode$string = _Json_wrap;
-var $elm$html$Html$Attributes$stringProperty = F2(
-	function (key, string) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$string(string));
-	});
+var $elm$html$Html$label = _VirtualDom_node('label');
 var $elm$html$Html$Attributes$name = $elm$html$Html$Attributes$stringProperty('name');
 var $elm$virtual_dom$VirtualDom$keyedNode = function (tag) {
 	return _VirtualDom_keyedNode(
@@ -6271,8 +6334,6 @@ var $author$project$Main$subjectChanged = F3(
 	});
 var $elm$html$Html$option = _VirtualDom_node('option');
 var $elm$html$Html$Attributes$selected = $elm$html$Html$Attributes$boolProperty('selected');
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Main$subjectOption = function (subject) {
 	return _Utils_Tuple2(
@@ -6328,60 +6389,84 @@ var $author$project$Main$subjectOptions = F2(
 		var options = A2($elm$core$List$map, $author$project$Main$subjectOption, availableSubjects);
 		return A2($elm$core$List$cons, selectedSubject, options);
 	});
-var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Main$renderCredit = F3(
 	function (model, index, credit) {
-		return A2(
-			$elm$html$Html$div,
-			_List_Nil,
+		return $author$project$ViewElements$formGroupRow(
 			_List_fromArray(
 				[
+					A2(
+					$elm$html$Html$label,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('col-sm-1 col-form-label'),
+							$elm$html$Html$Attributes$for('subjectSelection')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(
+							$elm$core$String$fromInt(index + 1))
+						])),
 					A3(
 					$elm$html$Html$Keyed$node,
 					'select',
 					_List_fromArray(
 						[
 							$elm$html$Html$Attributes$name('subjects'),
+							$elm$html$Html$Attributes$class('col-sm-4 custom-select'),
+							$elm$html$Html$Attributes$id('subjectSelection'),
 							$elm$html$Html$Events$onInput(
 							A2($author$project$Main$subjectChanged, model.allSubjects, index))
 						]),
 					A2($author$project$Main$subjectOptions, credit, model.availableSubjects)),
 					A2(
-					$elm$html$Html$input,
+					$elm$html$Html$div,
 					_List_fromArray(
 						[
-							$elm$html$Html$Attributes$placeholder('Hours'),
-							$elm$html$Html$Attributes$type_('number'),
-							$elm$html$Html$Attributes$name(
-							'subjectHours-' + $elm$core$String$fromInt(index)),
-							$elm$html$Html$Attributes$value(
-							(credit.hours > 0) ? $elm$core$String$fromFloat(credit.hours) : ''),
-							$elm$html$Html$Events$onInput(
+							$elm$html$Html$Attributes$class('col-sm-3')
+						]),
+					_List_fromArray(
+						[
 							A2(
-								$elm$core$Basics$composeR,
-								$author$project$Main$parseHourInput,
-								$author$project$Main$HoursChanged(index)))
-						]),
-					_List_Nil),
+							$elm$html$Html$input,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$placeholder('Hours'),
+									$elm$html$Html$Attributes$type_('number'),
+									$elm$html$Html$Attributes$name(
+									'subjectHours-' + $elm$core$String$fromInt(index)),
+									$elm$html$Html$Attributes$class('form-control'),
+									$elm$html$Html$Attributes$value(
+									(credit.hours > 0) ? $elm$core$String$fromFloat(credit.hours) : ''),
+									$elm$html$Html$Events$onInput(
+									A2(
+										$elm$core$Basics$composeR,
+										$author$project$Main$parseHourInput,
+										$author$project$Main$HoursChanged(index)))
+								]),
+							_List_Nil)
+						])),
 					A2(
-					$elm$html$Html$button,
+					$elm$html$Html$div,
 					_List_fromArray(
 						[
-							$elm$html$Html$Events$onClick(
-							$author$project$Main$SubjectRemoved(index))
+							$elm$html$Html$Attributes$class('col-sm-2')
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text('Remove')
+							A3(
+							$author$project$ViewElements$dangerButton,
+							'Remove',
+							$author$project$Main$SubjectRemoved(index),
+							false)
 						]))
 				]));
 	});
 var $author$project$Main$view = function (model) {
-	return A2(
-		$elm$html$Html$div,
-		_List_Nil,
+	return $author$project$ViewElements$container(
 		_List_fromArray(
 			[
+				$author$project$ViewElements$mainHeading('Enter course credits'),
+				$author$project$ViewElements$paragraph('Select your course subject from the dropdown, and enter credited hours in the input'),
 				A2(
 				$elm$html$Html$div,
 				_List_Nil,
@@ -6394,18 +6479,11 @@ var $author$project$Main$view = function (model) {
 				_List_Nil,
 				_List_fromArray(
 					[
-						A2(
-						$elm$html$Html$button,
-						_List_fromArray(
-							[
-								$elm$html$Html$Events$onClick($author$project$Main$SubjectAdded),
-								$elm$html$Html$Attributes$disabled(
-								!$author$project$Main$canAddSubject(model))
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Add subject')
-							]))
+						A3(
+						$author$project$ViewElements$primaryButton,
+						'Add subject',
+						$author$project$Main$SubjectAdded,
+						!$author$project$Main$canAddSubject(model))
 					]))
 			]));
 };
