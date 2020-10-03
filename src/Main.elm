@@ -141,11 +141,11 @@ canAddSubject model =
 renderCredit : Model -> Index -> Credit -> Html Msg
 renderCredit model index credit =
     formGroupRow
-        [ label [ class "col-sm-1 col-form-label", for "subjectSelection" ] [ index + 1 |> String.fromInt |> text ]
+        [ label [ class "col-sm-1 col-form-label text-right", for "subjectSelection" ] [ index + 1 |> String.fromInt |> text ]
         , Keyed.node "select"
             [ name "subjects", class "col-sm-4 custom-select", id "subjectSelection", onInput (subjectChanged model.allSubjects index) ]
             (subjectOptions credit model.availableSubjects)
-        , div [ class "col-sm-3" ]
+        , div [ class "col-sm-2" ]
             [ input
                 [ placeholder "Hours"
                 , type_ "number"
