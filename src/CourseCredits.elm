@@ -1,6 +1,7 @@
-module CourseCredits exposing (Credit, CreditSubject(..), Credits, Subject, SubjectId, Subjects, addCredit, anyMissingSubject, diffSubjects, empty, getSelectedSubjects, getSubjectById, remove, updateHours, updateSubject)
+module CourseCredits exposing (Credit, CreditSubject(..), Credits, Subject, SubjectId, Subjects, addCredit, anyMissingSubject, decodeSubjects, diffSubjects, empty, getSelectedSubjects, getSubjectById, remove, updateHours, updateSubject)
 
 import IndexedList exposing (Index, IndexedList)
+import Json.Decode exposing (Decoder, field, int, list, map2, string)
 import Set
 
 
@@ -133,3 +134,15 @@ diffSubjects subjectsToRemove allSubjects =
 getSubjectIds : Subjects -> List SubjectId
 getSubjectIds subjects =
     subjects |> List.map .id
+
+
+decodeSubjects : Decoder Subjects
+decodeSubjects =
+    list decodeSubject
+
+
+decodeSubject : Decoder Subject
+decodeSubject =
+    map2 Subject
+        (field "id" int)
+        (field "name" string)

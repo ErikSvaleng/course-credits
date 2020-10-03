@@ -1,21 +1,22 @@
 module Main exposing (main)
 
 import Browser
-import CourseCredits exposing (Credit, CreditSubject(..), Credits, Subject, Subjects)
+import CourseCredits exposing (Credit, CreditSubject(..), Credits, Subject, Subjects, decodeSubjects)
 import Html exposing (Html, button, div, input, option, text)
 import Html.Attributes exposing (disabled, name, placeholder, selected, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Html.Keyed as Keyed
 import IndexedList exposing (Index)
+import Json.Decode
 
 
 
 -- MAIN
 
 
-main : Program () Model Msg
+main : Program Json.Decode.Value Model Msg
 main =
-    Browser.sandbox { init = init, update = update, view = view }
+    Browser.element { init = init, update = update, view = view, subscriptions = subscriptions }
 
 
 
@@ -29,20 +30,27 @@ type alias Model =
     }
 
 
-init : Model
-init =
-    { allSubjects = allSubjectsInit
-    , availableSubjects = allSubjectsInit
-    , credits = CourseCredits.empty
-    }
+init : Json.Decode.Value -> ( Model, Cmd Msg )
+init subjects =
+    let
+        allSubjects =
+            Json.Decode.decodeValue decodeSubjects subjects |> Result.withDefault []
+    in
+    ( { allSubjects = allSubjects
+      , availableSubjects = allSubjects
+      , credits = CourseCredits.empty
+      }
+    , Cmd.none
+    )
 
 
-allSubjectsInit : Subjects
-allSubjectsInit =
-    [ Subject 1 "English"
-    , Subject 2 "French"
-    , Subject 3 "Math"
-    ]
+
+-- SUBSCRIPTIONS
+
+
+subscriptions : Model -> Sub Msg
+subscriptions _ =
+    Sub.none
 
 
 
@@ -60,20 +68,20 @@ type Msg
 -- update : Msg -> Model -> Model
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         ChangedCreditSubject index maybeSubject ->
-            changeCreditSubject index maybeSubject model
+            ( changeCreditSubject index maybeSubject model, Cmd.none )
 
         HoursChanged index hours ->
-            { model | credits = CourseCredits.updateHours index hours model.credits }
+            ( updateCredits (CourseCredits.updateHours index hours) model, Cmd.none )
 
         SubjectAdded ->
-            { model | credits = CourseCredits.addCredit (Credit NotSelected 0) model.credits }
+            ( updateCredits (CourseCredits.addCredit (Credit NotSelected 0)) model, Cmd.none )
 
         SubjectRemoved index ->
-            removeCreditSubject index model
+            ( removeCreditSubject index model, Cmd.none )
 
 
 removeCreditSubject : Index -> Model -> Model
