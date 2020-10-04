@@ -40,11 +40,15 @@ add thing list =
 
 nextIndex : Dict Index a -> Index
 nextIndex dict =
-    dict
-        |> Dict.keys
-        |> List.maximum
-        |> Maybe.withDefault lowestIndex
-        |> (+) 1
+    if Dict.isEmpty dict then
+        lowestIndex
+
+    else
+        dict
+            |> Dict.keys
+            |> List.maximum
+            |> Maybe.withDefault lowestIndex
+            |> (+) 1
 
 
 update : (a -> a) -> Index -> IndexedList a -> IndexedList a

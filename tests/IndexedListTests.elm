@@ -62,6 +62,16 @@ suite =
                         IndexedList.add "Bill" exampleIndexedList |> getIndexes
                 in
                 Expect.equalLists addedIndexes [ 0, 1, 2, 3, 4 ]
+        , test "Given an empty indexedlist, when adding a new item, it is given index 0" <|
+            \_ ->
+                let
+                    indexes =
+                        IndexedList.singleton "John"
+                            |> IndexedList.remove 0
+                            |> IndexedList.add "Bill"
+                            |> getIndexes
+                in
+                Expect.equalLists indexes [ 0 ]
         ]
 
 
