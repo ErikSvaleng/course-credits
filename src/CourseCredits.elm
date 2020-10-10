@@ -1,27 +1,13 @@
-module CourseCredits exposing (Credit, CreditSubject(..), Credits, Subject, SubjectId, Subjects, addCredit, anyMissingSubject, decodeSubjects, diffSubjects, empty, getSelectedSubjects, getSubjectById, remove, updateHours, updateSubject)
+module CourseCredits exposing (Credit, CreditSubject(..), Credits, Index, addCredit, anyMissingSubject, empty, getSelectedSubjects, map2List, remove, updateHours, updateSubject)
 
-import IndexedList exposing (Index, IndexedList)
-import Json.Decode exposing (Decoder, field, int, list, map2, string)
-import Set
-
-
-type alias SubjectId =
-    Int
-
-
-type alias Subject =
-    { id : SubjectId
-    , name : String
-    }
+import Array exposing (Array)
+import Array.Extra as Array
+import Subjects exposing (Subject, Subjects)
 
 
 type CreditSubject
     = NotSelected
     | Selected Subject
-
-
-type alias Subjects =
-    List Subject
 
 
 type alias Credit =
@@ -31,14 +17,18 @@ type alias Credit =
 
 
 type alias Credits =
-    IndexedList Credit
+    Array Credit
+
+
+type alias Index =
+    Int
 
 
 anyMissingSubject : Credits -> Bool
 anyMissingSubject credits =
     credits
-        |> IndexedList.filter2List
-            (\_ credit ->
+        |> Array.filter
+            (\credit ->
                 case credit.subject of
                     Selected _ ->
                         False
@@ -46,18 +36,18 @@ anyMissingSubject credits =
                     NotSelected ->
                         True
             )
-        |> List.length
+        |> Array.length
         |> (<) 0
 
 
 updateHours : Index -> Float -> Credits -> Credits
 updateHours index hours credits =
-    IndexedList.update (updateCreditHours hours) index credits
+    Array.update index (updateCreditHours hours) credits
 
 
 remove : Index -> Credits -> Credits
 remove index credits =
-    IndexedList.remove index credits
+    Array.removeAt index credits
 
 
 updateCreditHours : Float -> Credit -> Credit
@@ -67,7 +57,7 @@ updateCreditHours hours subj =
 
 updateSubject : Index -> Subject -> Credits -> Credits
 updateSubject index subject credits =
-    IndexedList.update (updateCreditSubject subject) index credits
+    Array.update index (updateCreditSubject subject) credits
 
 
 updateCreditSubject : Subject -> Credit -> Credit
@@ -77,32 +67,18 @@ updateCreditSubject subject credit =
 
 addCredit : Credit -> Credits -> Credits
 addCredit credit credits =
-    IndexedList.add credit credits
+    Array.push credit credits
 
 
 empty : Credits
 empty =
-    Credit NotSelected 0 |> IndexedList.singleton
-
-
-getSubjectById : Subjects -> SubjectId -> Maybe Subject
-getSubjectById subjects id =
-    let
-        matches =
-            List.filter (\subj -> subj.id == id) subjects
-    in
-    case matches of
-        [] ->
-            Nothing
-
-        first :: _ ->
-            Just first
+    [ Credit NotSelected 0 ] |> Array.fromList
 
 
 getSelectedSubjects : Credits -> Subjects
 getSelectedSubjects credits =
     credits
-        |> IndexedList.toList
+        |> Array.toIndexedList
         |> List.filterMap getSubject
 
 
@@ -116,33 +92,8 @@ getSubject ( _, credit ) =
             Nothing
 
 
-diffSubjects : Subjects -> Subjects -> Subjects
-diffSubjects subjectsToRemove allSubjects =
-    let
-        removeSet =
-            subjectsToRemove |> getSubjectIds |> Set.fromList
-
-        allSet =
-            allSubjects |> getSubjectIds |> Set.fromList
-
-        idsToKeep =
-            Set.diff allSet removeSet
-    in
-    List.filter (\subj -> Set.member subj.id idsToKeep) allSubjects
-
-
-getSubjectIds : Subjects -> List SubjectId
-getSubjectIds subjects =
-    subjects |> List.map .id
-
-
-decodeSubjects : Decoder Subjects
-decodeSubjects =
-    list decodeSubject
-
-
-decodeSubject : Decoder Subject
-decodeSubject =
-    map2 Subject
-        (field "id" int)
-        (field "name" string)
+map2List : (Index -> Credit -> b) -> Credits -> List b
+map2List mapFn credits =
+    credits
+        |> Array.indexedMap mapFn
+        |> Array.toList

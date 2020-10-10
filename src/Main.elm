@@ -1,13 +1,13 @@
 module Main exposing (main)
 
 import Browser
-import CourseCredits exposing (Credit, CreditSubject(..), Credits, Subject, Subjects, decodeSubjects)
+import CourseCredits exposing (Credit, CreditSubject(..), Credits, Index)
 import Html exposing (Html, div, input, label, option, text)
 import Html.Attributes exposing (class, for, id, name, placeholder, selected, type_, value)
 import Html.Events exposing (onInput)
 import Html.Keyed as Keyed
-import IndexedList exposing (Index)
 import Json.Decode
+import Subjects exposing (Subject, Subjects)
 import ViewElements exposing (container, dangerButton, formGroupRow, mainHeading, paragraph, primaryButton)
 
 
@@ -35,7 +35,7 @@ init : Json.Decode.Value -> ( Model, Cmd Msg )
 init subjects =
     let
         allSubjects =
-            Json.Decode.decodeValue decodeSubjects subjects |> Result.withDefault []
+            Json.Decode.decodeValue Subjects.decode subjects |> Result.withDefault []
     in
     ( { allSubjects = allSubjects
       , availableSubjects = allSubjects
@@ -116,7 +116,7 @@ updateSubject index maybeSubject model =
 
 updateAvailableSubjects : Model -> Model
 updateAvailableSubjects model =
-    { model | availableSubjects = CourseCredits.diffSubjects (CourseCredits.getSelectedSubjects model.credits) model.allSubjects }
+    { model | availableSubjects = Subjects.diff (CourseCredits.getSelectedSubjects model.credits) model.allSubjects }
 
 
 
@@ -128,7 +128,7 @@ view model =
     container
         [ mainHeading "Enter course credits"
         , paragraph "Select your course subject from the dropdown, and enter credited hours in the input"
-        , div [] (model.credits |> IndexedList.map2List (renderCredit model))
+        , div [] (model.credits |> CourseCredits.map2List (renderCredit model))
         , div [] [ primaryButton "Add subject" SubjectAdded (model |> canAddSubject |> not) ]
         ]
 
@@ -192,7 +192,7 @@ subjectChanged : List Subject -> Index -> String -> Msg
 subjectChanged allSubjects index stringId =
     stringId
         |> parseSubjectId
-        |> CourseCredits.getSubjectById allSubjects
+        |> Subjects.getById allSubjects
         |> ChangedCreditSubject index
 
 
